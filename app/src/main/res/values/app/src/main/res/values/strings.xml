@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">UPI Keypad Preview</string>
+    <string name="submit">SUBMIT</string>
+    <string name="backspace">Backspace</string>
+</resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="PinDot">
+        <item name="android:background">@drawable/pin_circle</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:layout_width">15dp</item>
+        <item name="android:layout_height">15dp</item>
+        <item name="android:layout_marginStart">15dp</item>
+    </style>
+
+    <style name="KeypadButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:background">@drawable/keypad_cell_bg</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="KeypadSubmit" parent="KeypadButton">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+</resources>
