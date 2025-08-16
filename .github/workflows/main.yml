@@ -1,0 +1,82 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Android project dir (where settings.gradle lives)
+        id: detect
+        shell: bash
+        run: |
+          set -e
+          FILE=$(git ls-files | grep -E 'settings\.gradle(\.kts)?$' | head -n1 || true)
+          if [ -z "$FILE" ]; then
+            echo "::error ::settings.gradle not found in repo. Push the Android project."
+            exit 1
+          fi
+          DIR=$(dirname "$FILE")
+          if [ "$DIR" = "." ]; then DIR=""; fi
+          echo "PROJECT_DIR=$DIR" | tee -a "$GITHUB_ENV"
+          echo "Project dir: ${DIR:-<repo root>}"
+
+      - name: Show tree
+        run: |
+          echo "PROJECT_DIR=${PROJECT_DIR:-<repo root>}"
+          find . -maxdepth 3 -type d | sort
+          echo "---- files ----"
+          find . -maxdepth 2 -name "settings.gradle*" -o -name "build.gradle*" -o -name "gradlew" -print
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 34
+          build-tools: 34.0.0
+
+      # If the wrapper is missing, create it with system Gradle
+      - name: Ensure Gradle wrapper exists
+        shell: bash
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if [ ! -f "./gradlew" ]; then
+            echo "No gradlew found. Generating wrapper..."
+            gradle wrapper
+          fi
+          chmod +x ./gradlew
+          ./gradlew --version
+
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v3
+        with:
+          build-root-directory: ${{ env.PROJECT_DIR }}
+
+      - name: Build (assembleDebug)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: ./gradlew --no-daemon clean assembleDebug
+
+      - name: List outputs
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          echo "---- outputs ----"
+          ls -R */build/outputs || true
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-artifacts
+          path: ${{ env.PROJECT_DIR }}**/build/outputs/apk/**/*.apk
+          if-no-files-found: warn
