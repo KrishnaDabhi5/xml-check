@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local config
+local.properties
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# NDK / CMake
+.externalNativeBuild/
+.cxx/
+
+# Misc
+captures/
+*.keystore
+*.jks
